@@ -50,7 +50,7 @@ ServiceName = namedtuple('ServiceName', 'project service number')
 
 
 class Service(object):
-    def __init__(self, name, client=None, project='default', links=None, volumes_from=None, **options):
+    def __init__(self, name, client=None, project='default', links=None, external_links=None, volumes_from=None, **options):
         if not re.match('^%s+$' % VALID_NAME_CHARS, name):
             raise ConfigError('Invalid service name "%s" - only %s are allowed' % (name, VALID_NAME_CHARS))
         if not re.match('^%s+$' % VALID_NAME_CHARS, project):
@@ -58,7 +58,8 @@ class Service(object):
         if 'image' in options and 'build' in options:
             raise ConfigError('Service %s has both an image and build path specified. A service can either be built to image or use an existing image, not both.' % name)
 
-        supported_options = DOCKER_CONFIG_KEYS + ['build', 'expose']
+        supported_options = DOCKER_CONFIG_KEYS + ['build', 'expose',
+                'external_links']
 
         for k in options:
             if k not in supported_options:
@@ -71,6 +72,7 @@ class Service(object):
         self.client = client
         self.project = project
         self.links = links or []
+        self.external_links = external_links or []
         self.volumes_from = volumes_from or []
         self.options = options
 
@@ -305,6 +307,8 @@ class Service(object):
                 links.append((container.name, self.name))
                 links.append((container.name, container.name))
                 links.append((container.name, container.name_without_project))
+        for external_link in self.external_links:
+            links.append((external_link, external_link))
         return links
 
     def _get_volumes_from(self, intermediate_container=None):
