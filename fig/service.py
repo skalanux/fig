@@ -308,7 +308,11 @@ class Service(object):
                 links.append((container.name, container.name))
                 links.append((container.name, container.name_without_project))
         for external_link in self.external_links:
-            links.append((external_link, external_link))
+            if ':' not in external_link:
+                link_name = external_link
+            else:
+                external_link, link_name = external_link.split(':')
+            links.append((external_link, link_name))
         return links
 
     def _get_volumes_from(self, intermediate_container=None):
