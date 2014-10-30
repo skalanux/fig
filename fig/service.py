@@ -59,7 +59,7 @@ class Service(object):
             raise ConfigError('Service %s has both an image and build path specified. A service can either be built to image or use an existing image, not both.' % name)
 
         supported_options = DOCKER_CONFIG_KEYS + ['build', 'expose',
-                'external_links']
+                                                  'external_links']
 
         for k in options:
             if k not in supported_options:
