@@ -10,6 +10,24 @@ Most commands are run against one or more services. If the service is omitted, i
 
 Run `fig [COMMAND] --help` for full usage.
 
+## Options
+
+### --verbose
+
+ Show more output
+
+### --version
+
+ Print version and exit
+
+### -f, --file FILE
+
+ Specify an alternate fig file (default: fig.yml)
+
+### -p, --project-name NAME
+
+ Specify an alternate project name (default: directory name)
+
 ## Commands
 
 ### build
@@ -101,6 +119,8 @@ By default if there are existing containers for a service, `fig up` will stop an
 
 Several environment variables can be used to configure Fig's behaviour.
 
+Variables starting with `DOCKER_` are the same as those used to configure the Docker command-line client. If you're using boot2docker, `$(boot2docker shellinit)` will set them to their correct values.
+
 ### FIG\_PROJECT\_NAME
 
 Set the project name, which is prepended to the name of every container started by Fig. Defaults to the `basename` of the current working directory.
@@ -112,3 +132,11 @@ Set the path to the `fig.yml` to use. Defaults to `fig.yml` in the current worki
 ### DOCKER\_HOST
 
 Set the URL to the docker daemon. Defaults to `unix:///var/run/docker.sock`, as with the docker client.
+
+### DOCKER\_TLS\_VERIFY
+
+When set to anything other than an empty string, enables TLS communication with the daemon.
+
+### DOCKER\_CERT\_PATH
+
+Configure the path to the `ca.pem`, `cert.pem` and `key.pem` files used for TLS verification. Defaults to `~/.docker`.

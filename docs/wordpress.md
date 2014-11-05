@@ -8,7 +8,7 @@ Getting started with Fig and Wordpress
 
 Fig makes it nice and easy to run Wordpress in an isolated environment. [Install Fig](install.html), then download Wordpress into the current directory:
 
-    $ curl http://wordpress.org/wordpress-3.8.1.tar.gz | tar -xvzf -
+    $ curl https://wordpress.org/latest.tar.gz | tar -xvzf -
 
 This will create a directory called `wordpress`, which you can rename to the name of your project if you wish. Inside that directory, we create `Dockerfile`, a file that defines what environment your app is going to run in:
 
@@ -37,7 +37,7 @@ db:
     MYSQL_DATABASE: wordpress
 ```
 
-Two supporting files are needed to get this working - first up, `wp-config.php` is the standard Wordpress config file with a single change to make it read the MySQL host and port from the environment variables passed in by Fig:
+Two supporting files are needed to get this working - first up, `wp-config.php` is the standard Wordpress config file with a single change to point the database configuration at the `db` container:
 
 ```
 <?php

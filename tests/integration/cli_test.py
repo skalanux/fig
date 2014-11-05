@@ -25,6 +25,16 @@ class CLITestCase(DockerClientTestCase):
     def project(self):
         return self.command.get_project(self.command.get_config_path())
 
+    def test_help(self):
+        old_base_dir = self.command.base_dir
+        self.command.base_dir = 'tests/fixtures/no-figfile'
+        with self.assertRaises(SystemExit) as exc_context:
+            self.command.dispatch(['help', 'up'], None)
+            self.assertIn('Usage: up [options] [SERVICE...]', str(exc_context.exception))
+        # self.project.kill() fails during teardown
+        # unless there is a figfile.
+        self.command.base_dir = old_base_dir
+
     @patch('sys.stdout', new_callable=StringIO)
     def test_ps(self, mock_stdout):
         self.project.get_service('simple').create_container()
@@ -205,6 +215,26 @@ class CLITestCase(DockerClientTestCase):
             container.human_readable_command,
             u'/bin/echo helloworld'
         )
+
+    @patch('dockerpty.start')
+    def test_run_service_with_environement_overridden(self, _):
+        name = 'service'
+        self.command.base_dir = 'tests/fixtures/environment-figfile'
+        self.command.dispatch(
+            ['run', '-e', 'foo=notbar', '-e', 'allo=moto=bobo',
+             '-e', 'alpha=beta', name],
+            None
+        )
+        service = self.project.get_service(name)
+        container = service.containers(stopped=True, one_off=True)[0]
+        # env overriden
+        self.assertEqual('notbar', container.environment['foo'])
+        # keep environement from yaml
+        self.assertEqual('world', container.environment['hello'])
+        # added option from command line
+        self.assertEqual('beta', container.environment['alpha'])
+        # make sure a value with a = don't crash out
+        self.assertEqual('moto=bobo', container.environment['allo'])
 
     def test_rm(self):
         service = self.project.get_service('simple')
